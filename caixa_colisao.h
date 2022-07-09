@@ -8,6 +8,6 @@ typedef struct {
     float x, y, lar, alt;
 } Caixa_colisao;
 
-Caixa_colisao *criar_colisao(float, float, float, float, float);
+Caixa_colisao *criar_colisao(float, float, float, float);
 
 #endif // DEFINES_H_INCLUDED

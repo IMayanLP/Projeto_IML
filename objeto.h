@@ -5,13 +5,15 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
 
+#include "define.h"
+
 typedef struct {
     ALLEGRO_BITMAP* img;
     int ID;
     float x, y, alt, lar, prop;
 } Objeto;
 
-Objeto *criar_obj(char *, float, float, float, float, float, int);
+Objeto *criar_obj(char *, float, float, float, float, int);
 void desenhar_obj(Objeto *);
 void destruir_obj(Objeto*);
 

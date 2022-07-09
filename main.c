@@ -98,24 +98,25 @@ int main(){
     al_start_timer(timer);
 
     /** VARIAVEIS DO JOGO **/
+    prop = red_x;
     srand(time(NULL));
 
     ALLEGRO_BITMAP* spritesheet = al_load_bitmap("src/spritesheet.png");
     must_init(spritesheet, "sprites");
 
-    Botao *botao = criar_botao("src/botao.png", 200, 200, 100, 100, red_x);
+    Botao *botao = criar_botao("src/botao.png", 200, 200, 100, 100);
     int x = 0, y = 0;
 
-    Jogador *jogador = criar_jogador(spritesheet, 200, 200, 3, red_x);
+    Jogador *jogador = criar_jogador(spritesheet, 200, 200, 3);
 
-    int mapa_x = arredondar((float) SCREEN_WIDTH / (float) SPRITE_TAM);
-    int mapa_y = arredondar((float) SCREEN_HEIGTH / (float) SPRITE_TAM);
+    mapa_x = arredondar((float) SCREEN_WIDTH / (float) SPRITE_TAM);
+    mapa_y = arredondar((float) SCREEN_HEIGTH / (float) SPRITE_TAM);
 
     Objeto *mapa[mapa_x][mapa_y];
 
     for(int i = 0; i < mapa_x; i++){
         for(int j = 0; j < mapa_y; j++){
-            mapa[i][j] = criar_obj("src/folha.png", (i*SPRITE_TAM)*red_x, (j*SPRITE_TAM)*red_x, SPRITE_TAM, SPRITE_TAM, red_x, CHAO);
+            mapa[i][j] = criar_obj("src/folha.png", (i*SPRITE_TAM)*red_x, (j*SPRITE_TAM)*red_x, SPRITE_TAM, SPRITE_TAM, CHAO);
         }
     }
 
@@ -124,7 +125,7 @@ int main(){
         int num_x = rand() % mapa_x;
         int num_y = rand() % mapa_y;
         destruir_obj(mapa[num_x][num_y]);
-        mapa[num_x][num_y] = criar_obj("src/parede.png", (num_x*SPRITE_TAM)*red_x, (num_y*SPRITE_TAM)*red_x, SPRITE_TAM, SPRITE_TAM, red_x, PAREDE);
+        mapa[num_x][num_y] = criar_obj("src/parede.png", (num_x*SPRITE_TAM)*red_x, (num_y*SPRITE_TAM)*red_x, SPRITE_TAM, SPRITE_TAM, PAREDE);
     }
 
     while(!fim){
@@ -147,14 +148,14 @@ int main(){
         }
 
         else if(evento.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
-            if(click_botao(botao, x, y)) printf("clicou");
+
         }
 
         else if(evento.type == ALLEGRO_EVENT_TIMER){
             if(key[ALLEGRO_KEY_ESCAPE]) fim = true;
             re_desenhar = true;
             // logica do jogo
-            tick_jogador(jogador, mapa, red_x);
+            tick_jogador(jogador, mapa);
         }
 
         else if(evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE) fim = true;
@@ -164,8 +165,8 @@ int main(){
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_filled_rectangle(0, 0, largura_tela, altura_tela, al_map_rgb(30, 30, 30));
 
-            for(int i = 0; i < 20; i++){
-                for(int j = 0; j < 12; j++){
+            for(int i = 0; i < mapa_x; i++){
+                for(int j = 0; j < mapa_y; j++){
                     if(mapa[i][j] != NULL) desenhar_obj(mapa[i][j]);
                 }
             }

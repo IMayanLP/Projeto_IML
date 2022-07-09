@@ -1,6 +1,6 @@
 #include "caixa_colisao.h"
 
-Caixa_colisao *criar_colisao(float x, float y, float lar, float alt, float prop){
+Caixa_colisao *criar_colisao(float x, float y, float lar, float alt){
     Caixa_colisao* col = (Caixa_colisao*)malloc(sizeof(Caixa_colisao));
 
     col->x = x/prop;

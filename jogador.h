@@ -3,24 +3,22 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
 
 #include "objeto.h"
 #include "caixa_colisao.h"
 #include "define.h"
 
-#define CIMA 0
-#define DIR 1
-#define BAIXO 2
-#define ESQ 3
-
 typedef struct {
+    // atributos
+    float vida_max, vida_atual;
+
     // movimentação
     int dir[4];
     int moving;
     float x, y, vel;
 
     // colisão
-    float alt, lar;
     Caixa_colisao *col;
 
     // animação
@@ -32,13 +30,13 @@ typedef struct {
     ALLEGRO_BITMAP* down[4];
 } Jogador;
 
-Jogador *criar_jogador(ALLEGRO_BITMAP *, float, float, float, float);
+Jogador *criar_jogador(ALLEGRO_BITMAP *, float, float, float);
 void mover_jogador(Jogador *, int, int);
-void tick_jogador(Jogador *, Objeto *[20][12], float);
+void tick_jogador(Jogador *, Objeto *[mapa_x][mapa_y]);
 void desenhar_jogador(Jogador *);
 void destruir_jogador(Jogador *);
 int andando(Jogador *);
-int colidiu(Jogador *, Objeto *[20][12], float);
+int colidiu(Jogador *, Objeto *[mapa_x][mapa_y]);
 int coordMatriz(float);
 
 #endif // JOGADOR_H_INCLUDED

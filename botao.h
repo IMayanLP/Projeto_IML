@@ -5,12 +5,14 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
 
+#include "define.h"
+
 typedef struct {
     ALLEGRO_BITMAP* img;
     float x, y, alt, lar, prop;
 } Botao;
 
-Botao* criar_botao(char *, float, float, float, float, float);
+Botao* criar_botao(char *, float, float, float, float);
 int click_botao(Botao* b, float, float);
 void desenhar_botao(Botao* b);
 void destruir_botao(Botao* b);

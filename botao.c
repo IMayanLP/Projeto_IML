@@ -1,6 +1,6 @@
 #include "botao.h"
 
-Botao* criar_botao(char *arquivo, float x, float y, float lar, float alt, float prop){
+Botao* criar_botao(char *arquivo, float x, float y, float lar, float alt){
    Botao* b = (Botao*) malloc(sizeof(Botao));
 
    b->img = al_load_bitmap(arquivo);

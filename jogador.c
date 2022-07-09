@@ -1,6 +1,6 @@
 #include "jogador.h"
 
-Jogador *criar_jogador(ALLEGRO_BITMAP* spritesheet, float x, float y, float vel, float prop){
+Jogador *criar_jogador(ALLEGRO_BITMAP* spritesheet, float x, float y, float vel){
     Jogador *j = (Jogador*) malloc(sizeof(Jogador));
 
     int i;
@@ -11,6 +11,8 @@ Jogador *criar_jogador(ALLEGRO_BITMAP* spritesheet, float x, float y, float vel,
         j->down[i] = al_create_sub_bitmap(spritesheet, i*SPRITE_TAM, 192, SPRITE_TAM, SPRITE_TAM);
         j->dir[i] = 0;
     }
+    j->vida_atual = 100;
+    j->vida_max = 100;
     j->x = x/prop;
     j->y = y/prop;
     j->vel = vel;
@@ -18,7 +20,7 @@ Jogador *criar_jogador(ALLEGRO_BITMAP* spritesheet, float x, float y, float vel,
     j->moving = 0;
     j->orient = 1;
 
-    j->col = criar_colisao(22, 28, 32, 40, prop);
+    j->col = criar_colisao(22, 28, 32, 40);
 
     return j;
 }
@@ -27,24 +29,24 @@ void mover_jogador(Jogador *jogador, int key, int event){
     if(event == KEY_DOWN){
         switch(key){
         case ALLEGRO_KEY_W:
-            jogador->moving = 1;
-            jogador->dir[CIMA] = 1;
-            jogador->orient = 0;
+            jogador->moving = TRUE;
+            jogador->dir[CIMA] = TRUE;
+            jogador->orient = CIMA;
             break;
         case ALLEGRO_KEY_S:
-            jogador->moving = 1;
-            jogador->dir[BAIXO] = 1;
-            jogador->orient = 2;
+            jogador->moving = TRUE;
+            jogador->dir[BAIXO] = TRUE;
+            jogador->orient = BAIXO;
             break;
         case ALLEGRO_KEY_D:
-            jogador->moving = 1;
-            jogador->dir[DIR] = 1;
-            jogador->orient = 1;
+            jogador->moving = TRUE;
+            jogador->dir[DIR] = TRUE;
+            jogador->orient = DIR;
             break;
         case ALLEGRO_KEY_A:
-            jogador->moving = 1;
-            jogador->dir[ESQ] = 1;
-            jogador->orient = 3;
+            jogador->moving = TRUE;
+            jogador->dir[ESQ] = TRUE;
+            jogador->orient = ESQ;
             break;
         }
     }
@@ -52,31 +54,31 @@ void mover_jogador(Jogador *jogador, int key, int event){
     else if(event == KEY_UP){
         switch(key){
         case ALLEGRO_KEY_W:
-            jogador->dir[CIMA] = 0;
-            if(!andando(jogador)) jogador->moving = 0;
+            jogador->dir[CIMA] = FALSE;
+            if(!andando(jogador)) jogador->moving = FALSE;
             break;
         case ALLEGRO_KEY_S:
-            jogador->dir[BAIXO] = 0;
-            if(!andando(jogador)) jogador->moving = 0;
+            jogador->dir[BAIXO] = FALSE;
+            if(!andando(jogador)) jogador->moving = FALSE;
             break;
         case ALLEGRO_KEY_D:
-            jogador->dir[DIR] = 0;
-            if(!andando(jogador)) jogador->moving = 0;
+            jogador->dir[DIR] = FALSE;
+            if(!andando(jogador)) jogador->moving = FALSE;
             break;
         case ALLEGRO_KEY_A:
-            jogador->dir[ESQ] = 0;
-            if(!andando(jogador)) jogador->moving = 0;
+            jogador->dir[ESQ] = FALSE;
+            if(!andando(jogador)) jogador->moving = FALSE;
             break;
         }
     }
 }
 
-void tick_jogador(Jogador *jogador, Objeto *mapa[20][12], float prop){
+void tick_jogador(Jogador *jogador, Objeto *mapa[mapa_x][mapa_y]){
     if(jogador->moving){
         if(jogador->dir[CIMA]) {
             if((jogador->y + jogador->col->y) - jogador->vel > 0) {
-                if(colidiu(jogador, mapa, prop)) {
-                    jogador->dir[CIMA] = 0;
+                if(colidiu(jogador, mapa)) {
+                    jogador->dir[CIMA] = FALSE;
                     jogador->y += jogador->vel;
                 }
                 else jogador->y -= jogador->vel;
@@ -84,8 +86,8 @@ void tick_jogador(Jogador *jogador, Objeto *mapa[20][12], float prop){
         }
         if(jogador->dir[BAIXO]) {
             if((jogador->y + jogador->col->y + jogador->col->alt) + jogador->vel < SCREEN_HEIGTH) {
-                if(colidiu(jogador, mapa, prop)) {
-                    jogador->dir[BAIXO] = 0;
+                if(colidiu(jogador, mapa)) {
+                    jogador->dir[BAIXO] = FALSE;
                     jogador->y -= jogador->vel;
                 }
                 else jogador->y += jogador->vel;
@@ -93,8 +95,8 @@ void tick_jogador(Jogador *jogador, Objeto *mapa[20][12], float prop){
         }
         if(jogador->dir[DIR]) {
             if((jogador->x + jogador->col->x + jogador->col->lar) + jogador->vel < SCREEN_WIDTH) {
-                if(colidiu(jogador, mapa, prop)) {
-                    jogador->dir[DIR] = 0;
+                if(colidiu(jogador, mapa)) {
+                    jogador->dir[DIR] = FALSE;
                     jogador->x -= jogador->vel;
                 }
                 else jogador->x += jogador->vel;
@@ -102,8 +104,8 @@ void tick_jogador(Jogador *jogador, Objeto *mapa[20][12], float prop){
         }
         if(jogador->dir[ESQ]) {
             if((jogador->x + jogador->col->x) - jogador->vel > 0) {
-                if(colidiu(jogador, mapa, prop)) {
-                    jogador->dir[ESQ] = 0;
+                if(colidiu(jogador, mapa)) {
+                    jogador->dir[ESQ] = FALSE;
                     jogador->x += jogador->vel;
                 }
                 else jogador->x -= jogador->vel;
@@ -125,7 +127,7 @@ int andando(Jogador *j){
     return 0;
 }
 
-int colidiu(Jogador *j, Objeto *obj[20][12], float prop){
+int colidiu(Jogador *j, Objeto *obj[mapa_x][mapa_y]){
     // (x,y)
     if(obj[coordMatriz(j->x + j->col->x)][coordMatriz(j->y + j->col->y)]->ID == PAREDE ||
        obj[coordMatriz(j->x + j->col->x + j->col->lar)][coordMatriz(j->y + j->col->y)]->ID == PAREDE ||
@@ -135,10 +137,12 @@ int colidiu(Jogador *j, Objeto *obj[20][12], float prop){
 }
 
 int coordMatriz(float coord){
-    return ((int)(coord / 64));
+    return ((int)(coord / SPRITE_TAM));
 }
 
 void desenhar_jogador(Jogador *j){
+    al_draw_filled_rectangle(10, 30, 2*j->vida_max, 40, al_map_rgb(20, 20, 20));
+    al_draw_filled_rectangle(10, 30, 2*j->vida_atual, 40, al_map_rgb(255, 100, 100));
     switch(j->orient){
         case 0: al_draw_bitmap(j->down[(int) j->Satual], j->x, j->y, 0); break;
         case 1: al_draw_bitmap(j->right[(int) j->Satual], j->x, j->y, 0); break;
