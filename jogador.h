@@ -5,6 +5,8 @@
 #include <allegro5/allegro_image.h>
 
 #include "objeto.h"
+#include "caixa_colisao.h"
+#include "define.h"
 
 #define CIMA 0
 #define DIR 1
@@ -19,6 +21,7 @@ typedef struct {
 
     // colisão
     float alt, lar;
+    Caixa_colisao *col;
 
     // animação
     float Satual;

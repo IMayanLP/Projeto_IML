@@ -1,6 +1,6 @@
 #include "objeto.h"
 
-Objeto *criar_obj(char *arquivo, float x, float y, float lar, float alt, float prop, bool colisao, int ID){
+Objeto *criar_obj(char *arquivo, float x, float y, float lar, float alt, float prop, int ID){
     Objeto *obj = (Objeto*) malloc(sizeof(Objeto));
 
     obj->ID = ID;
@@ -10,7 +10,6 @@ Objeto *criar_obj(char *arquivo, float x, float y, float lar, float alt, float p
     obj->prop = prop;
     obj->lar = lar*prop;
     obj->alt = alt*prop;
-    obj->colisao = colisao;
 
     return obj;
 }

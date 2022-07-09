@@ -9,10 +9,9 @@ typedef struct {
     ALLEGRO_BITMAP* img;
     int ID;
     float x, y, alt, lar, prop;
-    bool colisao;
 } Objeto;
 
-Objeto *criar_obj(char *, float, float, float, float, float, bool, int);
+Objeto *criar_obj(char *, float, float, float, float, float, int);
 void desenhar_obj(Objeto *);
 void destruir_obj(Objeto*);
 

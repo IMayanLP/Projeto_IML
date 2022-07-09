@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <time.h>
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
@@ -12,12 +14,6 @@
 #include "objeto.h"
 #include "define.h"
 
-// Teclado
-#define KEY_SEEN     1
-#define KEY_RELEASED 2
-
-#define FPS 60
-
 // iniciar elementos allegro
 void must_init(bool test, const char *description){
     if(test) return;
@@ -26,9 +22,11 @@ void must_init(bool test, const char *description){
     exit(1);
 }
 
-int bateu(int Ax, int Ay, int Bx, int By, int Aw, int Ah, int Bw, int Bh){
-    if(Ax + Aw > Bx && Ax < Bx + Bw && Ay + Ah > By && Ay < By + Bw) return 1;
-    return 0;
+int arredondar(float x){
+    if(x != (int) x){
+        return (int)x + 1;
+    }
+    return x;
 }
 
 int main(){
@@ -100,6 +98,8 @@ int main(){
     al_start_timer(timer);
 
     /** VARIAVEIS DO JOGO **/
+    srand(time(NULL));
+
     ALLEGRO_BITMAP* spritesheet = al_load_bitmap("src/spritesheet.png");
     must_init(spritesheet, "sprites");
 
@@ -108,18 +108,24 @@ int main(){
 
     Jogador *jogador = criar_jogador(spritesheet, 200, 200, 3, red_x);
 
-    Objeto *mapa[20][12];
+    int mapa_x = arredondar((float) SCREEN_WIDTH / (float) SPRITE_TAM);
+    int mapa_y = arredondar((float) SCREEN_HEIGTH / (float) SPRITE_TAM);
 
-    for(int i = 0; i < 20; i++){
-        for(int j = 0; j < 12; j++){
-            mapa[i][j] = criar_obj("src/folha.png", (i*64)*red_x, (j*64)*red_x, 64, 64, red_x, false, 4);
+    Objeto *mapa[mapa_x][mapa_y];
+
+    for(int i = 0; i < mapa_x; i++){
+        for(int j = 0; j < mapa_y; j++){
+            mapa[i][j] = criar_obj("src/folha.png", (i*SPRITE_TAM)*red_x, (j*SPRITE_TAM)*red_x, SPRITE_TAM, SPRITE_TAM, red_x, CHAO);
         }
     }
 
-     destruir_obj(mapa[5][5]);
-     mapa[5][5] = criar_obj("src/parede.png", (5*64)*red_x, (5*64)*red_x, 64, 64, red_x, true, 5);
-     destruir_obj(mapa[8][7]);
-     mapa[8][7] = criar_obj("src/parede.png", (8*64)*red_x, (7*64)*red_x, 64, 64, red_x, true, 5);
+    int i;
+    for(i = 0; i < 4; i++){
+        int num_x = rand() % mapa_x;
+        int num_y = rand() % mapa_y;
+        destruir_obj(mapa[num_x][num_y]);
+        mapa[num_x][num_y] = criar_obj("src/parede.png", (num_x*SPRITE_TAM)*red_x, (num_y*SPRITE_TAM)*red_x, SPRITE_TAM, SPRITE_TAM, red_x, PAREDE);
+    }
 
     while(!fim){
         ALLEGRO_EVENT evento;
@@ -128,11 +134,11 @@ int main(){
         /** TICK **/
         if(evento.type == ALLEGRO_EVENT_KEY_DOWN){
             if(evento.keyboard.keycode == ALLEGRO_KEY_ESCAPE) fim = true;
-            mover_jogador(jogador, evento.keyboard.keycode, 0);
+            mover_jogador(jogador, evento.keyboard.keycode, KEY_DOWN);
         }
 
         else if(evento.type == ALLEGRO_EVENT_KEY_UP){
-            mover_jogador(jogador, evento.keyboard.keycode, 1);
+            mover_jogador(jogador, evento.keyboard.keycode, KEY_UP);
         }
 
         else if(evento.type == ALLEGRO_EVENT_MOUSE_AXES){
@@ -164,15 +170,8 @@ int main(){
                 }
             }
 
-            for(int i = 0; i < SCREEN_HEIGTH; i++){
-                al_draw_filled_rectangle(0, i*64, largura_tela, (i*64)+1, al_map_rgb(100, 100, 200));
-            }
-            for(int i = 0; i < SCREEN_WIDTH; i++){
-                al_draw_filled_rectangle(i*64, 0, (i*64)+1, altura_tela, al_map_rgb(255, 200, 30));
-            }
-
             desenhar_jogador(jogador);
-            al_draw_rectangle(jogador->x, jogador->y, jogador->x + (jogador->lar/red_x), jogador->y + (jogador->alt/red_x), al_map_rgb(255, 255, 255), 1);
+            al_draw_rectangle(jogador->x + jogador->col->x, jogador->y + jogador->col->y, jogador->x + jogador->col->x + (jogador->col->lar), jogador->y + jogador->col->y + (jogador->col->alt), al_map_rgb(255, 255, 255), 1);
 
             al_draw_textf(font, al_map_rgb(0, 0, 0), 10, 10, 0, "<%.2f , %.2f>", jogador->x, jogador->y);
             al_draw_textf(font, al_map_rgb(0, 0, 0), 500, 10, 0, "<%d , %d>", (int)(jogador->x/64), (int)(jogador->y/64));
