@@ -30,3 +30,5 @@
 int mapa_x;
 int mapa_y;
 float prop;
+
+int arredondar(float);

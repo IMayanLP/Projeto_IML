@@ -12,7 +12,8 @@
 #include "botao.h"
 #include "jogador.h"
 #include "objeto.h"
-#include "define.h"
+#include "teclado.h"
+#include "jogo.h"
 
 // iniciar elementos allegro
 void must_init(bool test, const char *description){
@@ -20,13 +21,6 @@ void must_init(bool test, const char *description){
 
     printf("Nao foi possivel carregar: %s\n", description);
     exit(1);
-}
-
-int arredondar(float x){
-    if(x != (int) x){
-        return (int)x + 1;
-    }
-    return x;
 }
 
 int main(){
@@ -98,14 +92,13 @@ int main(){
     al_start_timer(timer);
 
     /** VARIAVEIS DO JOGO **/
+    Lista_teclas *teclas = criar_lteclas();
+    int x = 0, y = 0;
     prop = red_x;
     srand(time(NULL));
 
     ALLEGRO_BITMAP* spritesheet = al_load_bitmap("src/spritesheet.png");
     must_init(spritesheet, "sprites");
-
-    Botao *botao = criar_botao("src/botao.png", 200, 200, 100, 100);
-    int x = 0, y = 0;
 
     Jogador *jogador = criar_jogador(spritesheet, 200, 200, 3);
 
@@ -116,7 +109,7 @@ int main(){
 
     for(int i = 0; i < mapa_x; i++){
         for(int j = 0; j < mapa_y; j++){
-            mapa[i][j] = criar_obj("src/folha.png", (i*SPRITE_TAM)*red_x, (j*SPRITE_TAM)*red_x, SPRITE_TAM, SPRITE_TAM, CHAO);
+            mapa[i][j] = criar_obj("src/folha.png", (i*SPRITE_TAM)*prop, (j*SPRITE_TAM)*prop, SPRITE_TAM, SPRITE_TAM, CHAO);
         }
     }
 
@@ -125,7 +118,7 @@ int main(){
         int num_x = rand() % mapa_x;
         int num_y = rand() % mapa_y;
         destruir_obj(mapa[num_x][num_y]);
-        mapa[num_x][num_y] = criar_obj("src/parede.png", (num_x*SPRITE_TAM)*red_x, (num_y*SPRITE_TAM)*red_x, SPRITE_TAM, SPRITE_TAM, PAREDE);
+        mapa[num_x][num_y] = criar_obj("src/parede.png", (num_x*SPRITE_TAM)*prop, (num_y*SPRITE_TAM)*prop, SPRITE_TAM, SPRITE_TAM, PAREDE);
     }
 
     while(!fim){
@@ -135,10 +128,12 @@ int main(){
         /** TICK **/
         if(evento.type == ALLEGRO_EVENT_KEY_DOWN){
             if(evento.keyboard.keycode == ALLEGRO_KEY_ESCAPE) fim = true;
+            inserirTecla(teclas, evento.keyboard.keycode);
             mover_jogador(jogador, evento.keyboard.keycode, KEY_DOWN);
         }
 
         else if(evento.type == ALLEGRO_EVENT_KEY_UP){
+            removerTecla(teclas, evento.keyboard.keycode);
             mover_jogador(jogador, evento.keyboard.keycode, KEY_UP);
         }
 
@@ -148,13 +143,13 @@ int main(){
         }
 
         else if(evento.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
-
         }
 
         else if(evento.type == ALLEGRO_EVENT_TIMER){
             if(key[ALLEGRO_KEY_ESCAPE]) fim = true;
             re_desenhar = true;
             // logica do jogo
+            //if(pressionado(teclas, ALLEGRO_KEY_D)) printf("Pressionando\n");
             tick_jogador(jogador, mapa);
         }
 
@@ -175,7 +170,6 @@ int main(){
             al_draw_rectangle(jogador->x + jogador->col->x, jogador->y + jogador->col->y, jogador->x + jogador->col->x + (jogador->col->lar), jogador->y + jogador->col->y + (jogador->col->alt), al_map_rgb(255, 255, 255), 1);
 
             al_draw_textf(font, al_map_rgb(0, 0, 0), 10, 10, 0, "<%.2f , %.2f>", jogador->x, jogador->y);
-            al_draw_textf(font, al_map_rgb(0, 0, 0), 500, 10, 0, "<%d , %d>", (int)(jogador->x/64), (int)(jogador->y/64));
             al_flip_display();
 
             re_desenhar = false;
@@ -183,7 +177,6 @@ int main(){
     }
 
     // Destroi os bitmaps, fontes, tela, timer e tudo mais ao final do loop
-    destruir_botao(botao);
     destruir_jogador(jogador);
 
     al_destroy_font(font);

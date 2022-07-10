@@ -7,7 +7,6 @@ Objeto *criar_obj(char *arquivo, float x, float y, float lar, float alt, int ID)
     obj->img = al_load_bitmap(arquivo);
     obj->x = x/prop;
     obj->y = y/prop;
-    obj->prop = prop;
     obj->lar = lar*prop;
     obj->alt = alt*prop;
 

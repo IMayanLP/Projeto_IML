@@ -7,7 +7,7 @@
 
 #include "objeto.h"
 #include "caixa_colisao.h"
-#include "define.h"
+#include "jogo.h"
 
 typedef struct {
     // atributos
@@ -33,10 +33,10 @@ typedef struct {
 Jogador *criar_jogador(ALLEGRO_BITMAP *, float, float, float);
 void mover_jogador(Jogador *, int, int);
 void tick_jogador(Jogador *, Objeto *[mapa_x][mapa_y]);
-void desenhar_jogador(Jogador *);
-void destruir_jogador(Jogador *);
 int andando(Jogador *);
 int colidiu(Jogador *, Objeto *[mapa_x][mapa_y]);
 int coordMatriz(float);
+void desenhar_jogador(Jogador *);
+void destruir_jogador(Jogador *);
 
 #endif // JOGADOR_H_INCLUDED

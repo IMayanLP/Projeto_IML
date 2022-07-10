@@ -20,7 +20,7 @@ Jogador *criar_jogador(ALLEGRO_BITMAP* spritesheet, float x, float y, float vel)
     j->moving = 0;
     j->orient = 1;
 
-    j->col = criar_colisao(22, 28, 32, 40);
+    j->col = criar_colisao(14, 20, 34, 40);
 
     return j;
 }
@@ -129,11 +129,10 @@ int andando(Jogador *j){
 
 int colidiu(Jogador *j, Objeto *obj[mapa_x][mapa_y]){
     // (x,y)
-    if(obj[coordMatriz(j->x + j->col->x)][coordMatriz(j->y + j->col->y)]->ID == PAREDE ||
+    return ((obj[coordMatriz(j->x + j->col->x)][coordMatriz(j->y + j->col->y)]->ID == PAREDE ||
        obj[coordMatriz(j->x + j->col->x + j->col->lar)][coordMatriz(j->y + j->col->y)]->ID == PAREDE ||
        obj[coordMatriz(j->x + j->col->x)][coordMatriz(j->y + j->col->y + j->col->alt)]->ID == PAREDE ||
-       obj[coordMatriz(j->x + j->col->x + j->col->lar)][coordMatriz(j->y + j->col->y + j->col->alt)]->ID == PAREDE) return 1;
-    return 0;
+       obj[coordMatriz(j->x + j->col->x + j->col->lar)][coordMatriz(j->y + j->col->y + j->col->alt)]->ID == PAREDE));
 }
 
 int coordMatriz(float coord){
@@ -152,6 +151,7 @@ void desenhar_jogador(Jogador *j){
 }
 
 void destruir_jogador(Jogador *jogador){
+    destruir_col(jogador->col);
     free(jogador);
 }
 

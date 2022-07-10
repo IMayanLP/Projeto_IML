@@ -40,9 +40,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="botao.h" />
-		<Unit filename="define.c">
+		<Unit filename="caixa_colisao.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="caixa_colisao.h" />
 		<Unit filename="define.h" />
 		<Unit filename="jogador.c">
 			<Option compilerVar="CC" />
@@ -55,6 +56,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="objeto.h" />
+		<Unit filename="teclado.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="teclado.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

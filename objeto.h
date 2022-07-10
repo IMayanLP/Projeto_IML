@@ -5,12 +5,12 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
 
-#include "define.h"
+#include "jogo.h"
 
 typedef struct {
     ALLEGRO_BITMAP* img;
     int ID;
-    float x, y, alt, lar, prop;
+    float x, y, alt, lar;
 } Objeto;
 
 Objeto *criar_obj(char *, float, float, float, float, int);
