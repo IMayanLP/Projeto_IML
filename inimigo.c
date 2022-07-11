@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "inimigo.h"
 
 struct elemento{
@@ -86,7 +83,7 @@ void tick_inimigo(Inimigos *l, Jogador *j, Objeto *mapa[mapa_x][mapa_y]){
             aux->dados.Satual = 0;
         }
 
-        if(colidiu_inimigo(aux, j)){
+        if(colisao_InimigoPlayer(aux, j)){
             j->vida_atual -= 0.1;
             aux->dados.moving = FALSE;
             aux->dados.Satual = 0;
@@ -94,25 +91,25 @@ void tick_inimigo(Inimigos *l, Jogador *j, Objeto *mapa[mapa_x][mapa_y]){
 
         if(aux->dados.moving){
             if(aux->dados.y < j->y) {
-                if(!colidiu_inimigo_M(aux, mapa, 2)){
+                if(!colisao_InimigoMapa(aux, mapa, BAIXO)){
                     aux->dados.orient = CIMA;
                     aux->dados.y += aux->dados.vel;
                 }
             }
             if(aux->dados.y > j->y) {
-                if(!colidiu_inimigo_M(aux, mapa, 0)){
+                if(!colisao_InimigoMapa(aux, mapa, CIMA)){
                     aux->dados.orient = BAIXO;
                     aux->dados.y -= aux->dados.vel;
                 }
             }
             if(aux->dados.x < j->x && aux->dados.x < j->x + j->col->x) {
-                if(!colidiu_inimigo_M(aux, mapa, 1)){
+                if(!colisao_InimigoMapa(aux, mapa, DIR)){
                     aux->dados.orient = DIR;
                     aux->dados.x += aux->dados.vel;
                 }
             }
             if(aux->dados.x > j->x && aux->dados.x > j->x + j->col->x) {
-                if(!colidiu_inimigo_M(aux, mapa, 3)){
+                if(!colisao_InimigoMapa(aux, mapa, ESQ)){
                     aux->dados.orient = ESQ;
                     aux->dados.x -= aux->dados.vel;
                 }
@@ -124,30 +121,27 @@ void tick_inimigo(Inimigos *l, Jogador *j, Objeto *mapa[mapa_x][mapa_y]){
     }
 }
 
-int coordMatriz_ini(float coord){
-    return ((int)(coord / SPRITE_TAM));
-}
 
-int colidiu_inimigo_M(Inimigo *j, Objeto *obj[mapa_x][mapa_y], int dir){
-    if(dir == 0){
-        return ((obj[coordMatriz_ini(j->x + j->col->x)][coordMatriz_ini(j->y + j->col->y - j->vel)]->ID == PAREDE ||
-               obj[coordMatriz_ini(j->x + j->col->x + j->col->lar)][coordMatriz_ini(j->y + j->col->y - j->vel)]->ID == PAREDE));
+int colisao_InimigoMapa(Inimigo *j, Objeto *obj[mapa_x][mapa_y], int dir){
+    if(dir == CIMA){
+        return ((obj[coordMatriz(j->x + j->col->x)][coordMatriz(j->y + j->col->y - j->vel)]->ID == PAREDE ||
+               obj[coordMatriz(j->x + j->col->x + j->col->lar)][coordMatriz(j->y + j->col->y - j->vel)]->ID == PAREDE));
     }
-    if(dir == 1){
-        return ((obj[coordMatriz_ini(j->x + j->col->x + j->col->lar + j->vel)][coordMatriz_ini(j->y + j->col->y)]->ID == PAREDE ||
-               obj[coordMatriz_ini(j->x + j->col->x + j->col->lar + j->vel)][coordMatriz_ini(j->y + j->col->y + j->col->alt)]->ID == PAREDE));
+    if(dir == DIR){
+        return ((obj[coordMatriz(j->x + j->col->x + j->col->lar + j->vel)][coordMatriz(j->y + j->col->y)]->ID == PAREDE ||
+               obj[coordMatriz(j->x + j->col->x + j->col->lar + j->vel)][coordMatriz(j->y + j->col->y + j->col->alt)]->ID == PAREDE));
     }
-    if(dir == 2){
-        return ((obj[coordMatriz_ini(j->x + j->col->x)][coordMatriz_ini(j->y + j->col->y + j->col->alt + j->vel)]->ID == PAREDE ||
-               obj[coordMatriz_ini(j->x + j->col->x + j->col->lar)][coordMatriz_ini(j->y + j->col->y + j->col->alt + j->vel)]->ID == PAREDE));
+    if(dir == BAIXO){
+        return ((obj[coordMatriz(j->x + j->col->x)][coordMatriz(j->y + j->col->y + j->col->alt + j->vel)]->ID == PAREDE ||
+               obj[coordMatriz(j->x + j->col->x + j->col->lar)][coordMatriz(j->y + j->col->y + j->col->alt + j->vel)]->ID == PAREDE));
     }
-    if(dir == 3){
-        return ((obj[coordMatriz_ini(j->x + j->col->x - j->vel)][coordMatriz_ini(j->y + j->col->y)]->ID == PAREDE ||
-               obj[coordMatriz_ini(j->x + j->col->x - j->vel)][coordMatriz_ini(j->y + j->col->y + j->col->alt)]->ID == PAREDE));
+    if(dir == ESQ){
+        return ((obj[coordMatriz(j->x + j->col->x - j->vel)][coordMatriz(j->y + j->col->y)]->ID == PAREDE ||
+               obj[coordMatriz(j->x + j->col->x - j->vel)][coordMatriz(j->y + j->col->y + j->col->alt)]->ID == PAREDE));
     }
 }
 
-int colidiu_inimigo(Inimigo *l, Jogador *j){
+int colisao_InimigoPlayer(Inimigo *l, Jogador *j){
     return ((l->x + l->col->x > j->x + j->col->x && l->x + l->col->x < j->x + j->col->x + j->col->lar) &&
             (l->y + l->col->y > j->y + j->col->y && l->y + l->col->y < j->y + j->col->y + j->col->alt) ||
             (l->x + l->col->x + l->col->lar > j->x + j->col->x && l->x + l->col->x + l->col->lar < j->x + j->col->x + j->col->lar) &&

@@ -6,3 +6,7 @@ int arredondar(float x){
     }
     return x;
 }
+
+int coordMatriz(float coord){
+    return ((int)(coord / SPRITE_TAM));
+}

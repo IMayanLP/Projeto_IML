@@ -79,38 +79,30 @@ void tick_jogador(Jogador *jogador, Objeto *mapa[mapa_x][mapa_y]){
     if(jogador->moving){
         if(jogador->dir[CIMA]) {
             if((jogador->y + jogador->col->y) - jogador->vel > 0) {
-                if(colidiu(jogador, mapa)) {
-                    jogador->dir[CIMA] = FALSE;
-                    jogador->y += jogador->vel;
+                if(!colisao_PlayerMapa(jogador, mapa, CIMA)) {
+                    jogador->y -= jogador->vel;
                 }
-                else jogador->y -= jogador->vel;
             }
         }
         if(jogador->dir[BAIXO]) {
             if((jogador->y + jogador->col->y + jogador->col->alt) + jogador->vel < SCREEN_HEIGTH) {
-                if(colidiu(jogador, mapa)) {
-                    jogador->dir[BAIXO] = FALSE;
-                    jogador->y -= jogador->vel;
+                if(!colisao_PlayerMapa(jogador, mapa, BAIXO)) {
+                    jogador->y += jogador->vel;
                 }
-                else jogador->y += jogador->vel;
             }
         }
         if(jogador->dir[DIR]) {
             if((jogador->x + jogador->col->x + jogador->col->lar) + jogador->vel < SCREEN_WIDTH) {
-                if(colidiu(jogador, mapa)) {
-                    jogador->dir[DIR] = FALSE;
-                    jogador->x -= jogador->vel;
+                if(!colisao_PlayerMapa(jogador, mapa, DIR)) {
+                    jogador->x += jogador->vel;
                 }
-                else jogador->x += jogador->vel;
             }
         }
         if(jogador->dir[ESQ]) {
             if((jogador->x + jogador->col->x) - jogador->vel > 0) {
-                if(colidiu(jogador, mapa)) {
-                    jogador->dir[ESQ] = FALSE;
-                    jogador->x += jogador->vel;
+                if(!colisao_PlayerMapa(jogador, mapa, ESQ)) {
+                    jogador->x -= jogador->vel;
                 }
-                else jogador->x -= jogador->vel;
             }
         }
 
@@ -129,26 +121,31 @@ int andando(Jogador *j){
     return 0;
 }
 
-int colidiu(Jogador *j, Objeto *obj[mapa_x][mapa_y]){
-    // (x,y)
-    return ((obj[coordMatriz(j->x + j->col->x)][coordMatriz(j->y + j->col->y)]->ID == PAREDE ||
-       obj[coordMatriz(j->x + j->col->x + j->col->lar)][coordMatriz(j->y + j->col->y)]->ID == PAREDE ||
-       obj[coordMatriz(j->x + j->col->x)][coordMatriz(j->y + j->col->y + j->col->alt)]->ID == PAREDE ||
-       obj[coordMatriz(j->x + j->col->x + j->col->lar)][coordMatriz(j->y + j->col->y + j->col->alt)]->ID == PAREDE));
-}
-
-int coordMatriz(float coord){
-    return ((int)(coord / SPRITE_TAM));
+int colisao_PlayerMapa(Jogador *j, Objeto *obj[mapa_x][mapa_y], int dir){
+    if(dir == CIMA){
+        return ((obj[coordMatriz(j->x + j->col->x)][coordMatriz(j->y + j->col->y - j->vel)]->ID == PAREDE ||
+               obj[coordMatriz(j->x + j->col->x + j->col->lar)][coordMatriz(j->y + j->col->y - j->vel)]->ID == PAREDE));
+    }
+    if(dir == DIR){
+        return ((obj[coordMatriz(j->x + j->col->x + j->col->lar + j->vel)][coordMatriz(j->y + j->col->y)]->ID == PAREDE ||
+               obj[coordMatriz(j->x + j->col->x + j->col->lar + j->vel)][coordMatriz(j->y + j->col->y + j->col->alt)]->ID == PAREDE));
+    }
+    if(dir == BAIXO){
+        return ((obj[coordMatriz(j->x + j->col->x)][coordMatriz(j->y + j->col->y + j->col->alt + j->vel)]->ID == PAREDE ||
+               obj[coordMatriz(j->x + j->col->x + j->col->lar)][coordMatriz(j->y + j->col->y + j->col->alt + j->vel)]->ID == PAREDE));
+    }
+    if(dir == ESQ){
+        return ((obj[coordMatriz(j->x + j->col->x - j->vel)][coordMatriz(j->y + j->col->y)]->ID == PAREDE ||
+               obj[coordMatriz(j->x + j->col->x - j->vel)][coordMatriz(j->y + j->col->y + j->col->alt)]->ID == PAREDE));
+    }
 }
 
 void desenhar_jogador(Jogador *j){
-    //al_draw_filled_rectangle(10, 30, 2*j->vida_max, 40, al_map_rgb(20, 20, 20));
-    //al_draw_filled_rectangle(10, 30, 2*j->vida_atual, 40, al_map_rgb(255, 100, 100));
     switch(j->orient){
-        case 0: al_draw_bitmap(j->down[(int) j->Satual], j->x, j->y, 0); break;
-        case 1: al_draw_bitmap(j->right[(int) j->Satual], j->x, j->y, 0); break;
-        case 2: al_draw_bitmap(j->up[(int) j->Satual], j->x, j->y, 0); break;
-        case 3: al_draw_bitmap(j->left[(int) j->Satual], j->x, j->y, 0); break;
+        case CIMA: al_draw_bitmap(j->down[(int) j->Satual], j->x, j->y, 0); break;
+        case DIR: al_draw_bitmap(j->right[(int) j->Satual], j->x, j->y, 0); break;
+        case BAIXO: al_draw_bitmap(j->up[(int) j->Satual], j->x, j->y, 0); break;
+        case ESQ: al_draw_bitmap(j->left[(int) j->Satual], j->x, j->y, 0); break;
     }
     int i;
     for(i = 0; i < 10; i++) al_draw_bitmap(j->vida[1], i*20+15, 30, 0);

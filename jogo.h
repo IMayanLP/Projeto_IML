@@ -32,3 +32,4 @@ int mapa_y;
 float prop;
 
 int arredondar(float);
+int coordMatriz(float);

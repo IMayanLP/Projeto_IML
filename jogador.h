@@ -34,9 +34,7 @@ typedef struct {
 Jogador *criar_jogador(ALLEGRO_BITMAP *, ALLEGRO_BITMAP*, float, float, float);
 void mover_jogador(Jogador *, int, int);
 void tick_jogador(Jogador *, Objeto *[mapa_x][mapa_y]);
-int andando(Jogador *);
-int colidiu(Jogador *, Objeto *[mapa_x][mapa_y]);
-int coordMatriz(float);
+int colisao_PlayerMapa(Jogador *, Objeto *[mapa_x][mapa_y], int);
 void desenhar_jogador(Jogador *);
 void destruir_jogador(Jogador *);
 
