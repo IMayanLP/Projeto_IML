@@ -44,11 +44,18 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="caixa_colisao.h" />
-		<Unit filename="define.h" />
+		<Unit filename="inimigo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="inimigo.h" />
 		<Unit filename="jogador.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="jogador.h" />
+		<Unit filename="jogo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jogo.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

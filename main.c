@@ -11,6 +11,7 @@
 
 #include "botao.h"
 #include "jogador.h"
+#include "inimigo.h"
 #include "objeto.h"
 #include "teclado.h"
 #include "jogo.h"
@@ -92,7 +93,6 @@ int main(){
     al_start_timer(timer);
 
     /** VARIAVEIS DO JOGO **/
-    Lista_teclas *teclas = criar_lteclas();
     int x = 0, y = 0;
     prop = red_x;
     srand(time(NULL));
@@ -100,7 +100,18 @@ int main(){
     ALLEGRO_BITMAP* spritesheet = al_load_bitmap("src/spritesheet.png");
     must_init(spritesheet, "sprites");
 
-    Jogador *jogador = criar_jogador(spritesheet, 200, 200, 3);
+    ALLEGRO_BITMAP* bruxo = al_load_bitmap("src/bruxo.png");
+    must_init(bruxo, "bruxo");
+
+    ALLEGRO_BITMAP* coracao = al_load_bitmap("src/coracao.png");
+    must_init(coracao, "coracao");
+
+    Inimigos *mobs = criar_lInimigos();
+
+    inserir_inimigo(mobs, criar_inimigo(spritesheet, 500, 300, 1.5));
+    inserir_inimigo(mobs, criar_inimigo(spritesheet, 700, 500, 2));
+
+    Jogador *jogador = criar_jogador(bruxo, coracao, 200, 200, 3);
 
     mapa_x = arredondar((float) SCREEN_WIDTH / (float) SPRITE_TAM);
     mapa_y = arredondar((float) SCREEN_HEIGTH / (float) SPRITE_TAM);
@@ -128,12 +139,10 @@ int main(){
         /** TICK **/
         if(evento.type == ALLEGRO_EVENT_KEY_DOWN){
             if(evento.keyboard.keycode == ALLEGRO_KEY_ESCAPE) fim = true;
-            inserirTecla(teclas, evento.keyboard.keycode);
             mover_jogador(jogador, evento.keyboard.keycode, KEY_DOWN);
         }
 
         else if(evento.type == ALLEGRO_EVENT_KEY_UP){
-            removerTecla(teclas, evento.keyboard.keycode);
             mover_jogador(jogador, evento.keyboard.keycode, KEY_UP);
         }
 
@@ -149,7 +158,8 @@ int main(){
             if(key[ALLEGRO_KEY_ESCAPE]) fim = true;
             re_desenhar = true;
             // logica do jogo
-            //if(pressionado(teclas, ALLEGRO_KEY_D)) printf("Pressionando\n");
+            if(jogador->vida_atual <= 0) fim = true;
+            tick_inimigo(mobs, jogador, mapa);
             tick_jogador(jogador, mapa);
         }
 
@@ -167,7 +177,10 @@ int main(){
             }
 
             desenhar_jogador(jogador);
+
             al_draw_rectangle(jogador->x + jogador->col->x, jogador->y + jogador->col->y, jogador->x + jogador->col->x + (jogador->col->lar), jogador->y + jogador->col->y + (jogador->col->alt), al_map_rgb(255, 255, 255), 1);
+
+            desenhar_inimigos(mobs);
 
             al_draw_textf(font, al_map_rgb(0, 0, 0), 10, 10, 0, "<%.2f , %.2f>", jogador->x, jogador->y);
             al_flip_display();

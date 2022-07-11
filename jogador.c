@@ -1,6 +1,6 @@
 #include "jogador.h"
 
-Jogador *criar_jogador(ALLEGRO_BITMAP* spritesheet, float x, float y, float vel){
+Jogador *criar_jogador(ALLEGRO_BITMAP* spritesheet, ALLEGRO_BITMAP* coracao, float x, float y, float vel){
     Jogador *j = (Jogador*) malloc(sizeof(Jogador));
 
     int i;
@@ -11,13 +11,15 @@ Jogador *criar_jogador(ALLEGRO_BITMAP* spritesheet, float x, float y, float vel)
         j->down[i] = al_create_sub_bitmap(spritesheet, i*SPRITE_TAM, 192, SPRITE_TAM, SPRITE_TAM);
         j->dir[i] = 0;
     }
+    j->vida[0] = al_create_sub_bitmap(coracao, 0, 0, 16, 16);
+    j->vida[1] = al_create_sub_bitmap(coracao, 16, 0, 16, 16);
     j->vida_atual = 100;
     j->vida_max = 100;
     j->x = x/prop;
     j->y = y/prop;
     j->vel = vel;
     j->Satual = 0;
-    j->moving = 0;
+    j->moving = FALSE;
     j->orient = 1;
 
     j->col = criar_colisao(14, 20, 34, 40);
@@ -140,14 +142,17 @@ int coordMatriz(float coord){
 }
 
 void desenhar_jogador(Jogador *j){
-    al_draw_filled_rectangle(10, 30, 2*j->vida_max, 40, al_map_rgb(20, 20, 20));
-    al_draw_filled_rectangle(10, 30, 2*j->vida_atual, 40, al_map_rgb(255, 100, 100));
+    //al_draw_filled_rectangle(10, 30, 2*j->vida_max, 40, al_map_rgb(20, 20, 20));
+    //al_draw_filled_rectangle(10, 30, 2*j->vida_atual, 40, al_map_rgb(255, 100, 100));
     switch(j->orient){
         case 0: al_draw_bitmap(j->down[(int) j->Satual], j->x, j->y, 0); break;
         case 1: al_draw_bitmap(j->right[(int) j->Satual], j->x, j->y, 0); break;
         case 2: al_draw_bitmap(j->up[(int) j->Satual], j->x, j->y, 0); break;
         case 3: al_draw_bitmap(j->left[(int) j->Satual], j->x, j->y, 0); break;
     }
+    int i;
+    for(i = 0; i < 10; i++) al_draw_bitmap(j->vida[1], i*20+15, 30, 0);
+    for(i = 0; i < j->vida_atual/10; i++) al_draw_bitmap(j->vida[0], i*20+15, 30, 0);
 }
 
 void destruir_jogador(Jogador *jogador){

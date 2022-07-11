@@ -28,9 +28,10 @@ typedef struct {
     ALLEGRO_BITMAP* left[4];
     ALLEGRO_BITMAP* right[4];
     ALLEGRO_BITMAP* down[4];
+    ALLEGRO_BITMAP* vida[2];
 } Jogador;
 
-Jogador *criar_jogador(ALLEGRO_BITMAP *, float, float, float);
+Jogador *criar_jogador(ALLEGRO_BITMAP *, ALLEGRO_BITMAP*, float, float, float);
 void mover_jogador(Jogador *, int, int);
 void tick_jogador(Jogador *, Objeto *[mapa_x][mapa_y]);
 int andando(Jogador *);
