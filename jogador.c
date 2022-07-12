@@ -15,19 +15,24 @@ Jogador *criar_jogador(ALLEGRO_BITMAP* spritesheet, ALLEGRO_BITMAP* coracao, flo
     j->vida[1] = al_create_sub_bitmap(coracao, 16, 0, 16, 16);
     j->vida_atual = 100;
     j->vida_max = 100;
+    j->atk_base = 10;
+    j->atk_atual = 10;
     j->x = x/prop;
     j->y = y/prop;
     j->vel = vel;
     j->Satual = 0;
     j->moving = FALSE;
     j->orient = 1;
+    j->status = 0;
 
+    Caixa_colisao *teste = criar_colisao(40, 20, 40, 40);
+    j->item = criar_item(2, 5, 1, *teste);
     j->col = criar_colisao(14, 20, 34, 40);
 
     return j;
 }
 
-void mover_jogador(Jogador *jogador, int key, int event){
+void teclas_jogador(Jogador *jogador, int key, int event){
     if(event == KEY_DOWN){
         switch(key){
         case ALLEGRO_KEY_W:
@@ -44,12 +49,16 @@ void mover_jogador(Jogador *jogador, int key, int event){
             jogador->moving = TRUE;
             jogador->dir[DIR] = TRUE;
             jogador->orient = DIR;
+            jogador->item.angulo = -0.5;
             break;
         case ALLEGRO_KEY_A:
             jogador->moving = TRUE;
             jogador->dir[ESQ] = TRUE;
             jogador->orient = ESQ;
+            jogador->item.angulo = -3.31;
             break;
+        case ALLEGRO_KEY_B:
+            jogador->status = 1;
         }
     }
 
@@ -76,39 +85,61 @@ void mover_jogador(Jogador *jogador, int key, int event){
 }
 
 void tick_jogador(Jogador *jogador, Objeto *mapa[mapa_x][mapa_y]){
-    if(jogador->moving){
-        if(jogador->dir[CIMA]) {
-            if((jogador->y + jogador->col->y) - jogador->vel > 0) {
-                if(!colisao_PlayerMapa(jogador, mapa, CIMA)) {
-                    jogador->y -= jogador->vel;
+    if(jogador->status == 0){
+        if(jogador->moving){
+            if(jogador->dir[CIMA]) {
+                if((jogador->y + jogador->col->y) - jogador->vel > 0) {
+                    if(!colisao_PlayerMapa(jogador, mapa, CIMA)) {
+                        jogador->y -= jogador->vel;
+                    }
                 }
             }
-        }
-        if(jogador->dir[BAIXO]) {
-            if((jogador->y + jogador->col->y + jogador->col->alt) + jogador->vel < SCREEN_HEIGTH) {
-                if(!colisao_PlayerMapa(jogador, mapa, BAIXO)) {
-                    jogador->y += jogador->vel;
+            if(jogador->dir[BAIXO]) {
+                if((jogador->y + jogador->col->y + jogador->col->alt) + jogador->vel < SCREEN_HEIGTH) {
+                    if(!colisao_PlayerMapa(jogador, mapa, BAIXO)) {
+                        jogador->y += jogador->vel;
+                    }
                 }
             }
-        }
-        if(jogador->dir[DIR]) {
-            if((jogador->x + jogador->col->x + jogador->col->lar) + jogador->vel < SCREEN_WIDTH) {
-                if(!colisao_PlayerMapa(jogador, mapa, DIR)) {
-                    jogador->x += jogador->vel;
+            if(jogador->dir[DIR]) {
+                if((jogador->x + jogador->col->x + jogador->col->lar) + jogador->vel < SCREEN_WIDTH) {
+                    if(!colisao_PlayerMapa(jogador, mapa, DIR)) {
+                        jogador->x += jogador->vel;
+                    }
                 }
             }
-        }
-        if(jogador->dir[ESQ]) {
-            if((jogador->x + jogador->col->x) - jogador->vel > 0) {
-                if(!colisao_PlayerMapa(jogador, mapa, ESQ)) {
-                    jogador->x -= jogador->vel;
+            if(jogador->dir[ESQ]) {
+                if((jogador->x + jogador->col->x) - jogador->vel > 0) {
+                    if(!colisao_PlayerMapa(jogador, mapa, ESQ)) {
+                        jogador->x -= jogador->vel;
+                    }
                 }
             }
-        }
 
-        if(jogador->Satual < 3.9) jogador->Satual += 0.1;
-        else jogador->Satual = 0;
-    } else  jogador->Satual = 0;
+            if(jogador->Satual < 3.9) jogador->Satual += 0.1;
+            else jogador->Satual = 0;
+        } else  jogador->Satual = 0;
+    } else if(jogador->status == 1){
+        if(jogador->orient == DIR) {
+            if(jogador->item.angulo < 2) {
+                jogador->Satual = 0;
+                jogador->item.angulo += 0.1;
+            }
+            else {
+                jogador->item.angulo = -0.5;
+                jogador->status = 0;
+            }
+        } else if(jogador->orient == ESQ) {
+            if(jogador->item.angulo > -4.71) {
+                jogador->Satual = 0;
+                jogador->item.angulo += 0.1;
+            }
+            else {
+                jogador->item.angulo = 2;
+                jogador->status = 0;
+            }
+        }
+    }
 }
 
 int andando(Jogador *j){
@@ -147,6 +178,12 @@ void desenhar_jogador(Jogador *j){
         case BAIXO: al_draw_bitmap(j->up[(int) j->Satual], j->x, j->y, 0); break;
         case ESQ: al_draw_bitmap(j->left[(int) j->Satual], j->x, j->y, 0); break;
     }
+    if(j->status == 1) {
+        if(j->orient == DIR) al_draw_rotated_bitmap(j->item.sprite, 0, 32, j->x + 40, j->y + 40, j->item.angulo, 0);
+        if(j->orient == ESQ) al_draw_rotated_bitmap(j->item.sprite, 0, 32, j->x + 40, j->y + 40, j->item.angulo, 0);
+        al_draw_rectangle(j->x + j->item.col.x, j->y + j->item.col.y, j->x + j->item.col.x + j->item.col.lar, j->y + j->item.col.y + j->item.col.alt, al_map_rgb(255, 255, 255), 1);
+    }
+
     int i;
     for(i = 0; i < 10; i++) al_draw_bitmap(j->vida[1], i*20+15, 30, 0);
     for(i = 0; i < j->vida_atual/10; i++) al_draw_bitmap(j->vida[0], i*20+15, 30, 0);

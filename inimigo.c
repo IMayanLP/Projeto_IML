@@ -31,8 +31,41 @@ int inserir_inimigo(Inimigos *l, Inimigo novoIni){
     return 1;
 }
 
-Inimigo criar_inimigo(ALLEGRO_BITMAP *spritesheet, float x, float y, float vel){
+int remover_inimigo(Inimigos *l, int id){
+    if(l == NULL) return 0;
+    if(l->ini == NULL) return 0;
+    Elemento *ant = l->ini, *aux = ant->prox;
+    if(ant->dados.ID == id){
+        l->ini = aux;
+        for(int i = 0; i < 4; i++){
+            al_destroy_bitmap(ant->dados.up[i]);
+            al_destroy_bitmap(ant->dados.down[i]);
+            al_destroy_bitmap(ant->dados.left[i]);
+            al_destroy_bitmap(ant->dados.right[i]);
+        }
+        l->qtd--;
+        free(ant);
+        return 1;
+    }
+    while(aux->prox != NULL && aux->dados.ID != id){
+        ant = aux;
+        aux = aux->prox;
+    }
+    ant->prox = aux->prox;
+    for(int i = 0; i < 4; i++){
+        al_destroy_bitmap(aux->dados.up[i]);
+        al_destroy_bitmap(aux->dados.down[i]);
+        al_destroy_bitmap(aux->dados.left[i]);
+        al_destroy_bitmap(aux->dados.right[i]);
+    }
+    l->qtd--;
+    free(aux);
+    return 1;
+}
+
+Inimigo criar_inimigo(ALLEGRO_BITMAP *spritesheet, float x, float y, float vel, int id){
     Inimigo ini;
+    ini.ID = id;
     int i;
     for(i = 0; i < 4; i++){
         ini.up[i] = al_create_sub_bitmap(spritesheet, i*SPRITE_TAM, 0, SPRITE_TAM, SPRITE_TAM);
@@ -41,11 +74,11 @@ Inimigo criar_inimigo(ALLEGRO_BITMAP *spritesheet, float x, float y, float vel){
         ini.down[i] = al_create_sub_bitmap(spritesheet, i*SPRITE_TAM, 192, SPRITE_TAM, SPRITE_TAM);
     }
 
+    ini.vida = 50;
     ini.dir = 0;
     ini.x = x/prop;
     ini.y = y/prop;
     ini.vel = vel;
-    ini.ID = 0;
     ini.range = 200;
     ini.orient = 1;
     ini.Satual = 0;
@@ -66,7 +99,9 @@ void desenhar_inimigos(Inimigos *l){
             case CIMA: al_draw_bitmap(aux->dados.up[(int) aux->dados.Satual], aux->dados.x, aux->dados.y, 0); break;
             case ESQ: al_draw_bitmap(aux->dados.left[(int) aux->dados.Satual], aux->dados.x, aux->dados.y, 0); break;
         }
+
         al_draw_rectangle(aux->dados.x + aux->dados.col->x, aux->dados.y + aux->dados.col->y, aux->dados.x + aux->dados.col->x + aux->dados.col->lar, aux->dados.y + aux->dados.col->y + aux->dados.col->alt, al_map_rgb(255, 255, 255), 1);
+        al_draw_filled_rectangle(aux->dados.x, aux->dados.y - 10, aux->dados.x + (aux->dados.vida*1.2), aux->dados.y, al_map_rgb(255, 100, 100));
         aux = aux->prox;
     }
 }
@@ -76,46 +111,55 @@ void tick_inimigo(Inimigos *l, Jogador *j, Objeto *mapa[mapa_x][mapa_y]){
     if(l->ini == NULL) return;
     Elemento *aux = l->ini;
     while(aux != NULL){
-        if(!paz(aux, j)){
-            aux->dados.moving = TRUE;
+        if(aux->dados.vida > 0){
+            if(!paz(aux, j)){
+                aux->dados.moving = TRUE;
+            } else {
+                aux->dados.moving = FALSE;
+                aux->dados.Satual = 0;
+            }
+
+            if(colisao_InimigoPlayer(aux, j)){
+                j->vida_atual -= 0.1;
+                aux->dados.moving = FALSE;
+                aux->dados.Satual = 0;
+            }
+
+            if(aux->dados.moving){
+                if(aux->dados.y < j->y) {
+                    if(!colisao_InimigoMapa(aux, mapa, BAIXO)){
+                        aux->dados.orient = CIMA;
+                        aux->dados.y += aux->dados.vel;
+                    }
+                }
+                if(aux->dados.y > j->y) {
+                    if(!colisao_InimigoMapa(aux, mapa, CIMA)){
+                        aux->dados.orient = BAIXO;
+                        aux->dados.y -= aux->dados.vel;
+                    }
+                }
+                if(aux->dados.x < j->x && aux->dados.x < j->x + j->col->x) {
+                    if(!colisao_InimigoMapa(aux, mapa, DIR)){
+                        aux->dados.orient = DIR;
+                        aux->dados.x += aux->dados.vel;
+                    }
+                }
+                if(aux->dados.x > j->x && aux->dados.x > j->x + j->col->x) {
+                    if(!colisao_InimigoMapa(aux, mapa, ESQ)){
+                        aux->dados.orient = ESQ;
+                        aux->dados.x -= aux->dados.vel;
+                    }
+                }
+                if(aux->dados.Satual < 3.9) aux->dados.Satual += 0.1;
+                else aux->dados.Satual = 0;
+            }
+            if(j->status == 1){
+                if(colisao_InimigoItem(aux, j)) {
+                    aux->dados.vida -= 0.5;
+                }
+            }
         } else {
-            aux->dados.moving = FALSE;
-            aux->dados.Satual = 0;
-        }
-
-        if(colisao_InimigoPlayer(aux, j)){
-            j->vida_atual -= 0.1;
-            aux->dados.moving = FALSE;
-            aux->dados.Satual = 0;
-        }
-
-        if(aux->dados.moving){
-            if(aux->dados.y < j->y) {
-                if(!colisao_InimigoMapa(aux, mapa, BAIXO)){
-                    aux->dados.orient = CIMA;
-                    aux->dados.y += aux->dados.vel;
-                }
-            }
-            if(aux->dados.y > j->y) {
-                if(!colisao_InimigoMapa(aux, mapa, CIMA)){
-                    aux->dados.orient = BAIXO;
-                    aux->dados.y -= aux->dados.vel;
-                }
-            }
-            if(aux->dados.x < j->x && aux->dados.x < j->x + j->col->x) {
-                if(!colisao_InimigoMapa(aux, mapa, DIR)){
-                    aux->dados.orient = DIR;
-                    aux->dados.x += aux->dados.vel;
-                }
-            }
-            if(aux->dados.x > j->x && aux->dados.x > j->x + j->col->x) {
-                if(!colisao_InimigoMapa(aux, mapa, ESQ)){
-                    aux->dados.orient = ESQ;
-                    aux->dados.x -= aux->dados.vel;
-                }
-            }
-            if(aux->dados.Satual < 3.9) aux->dados.Satual += 0.1;
-            else aux->dados.Satual = 0;
+            remover_inimigo(l, aux->dados.ID);
         }
         aux = aux->prox;
     }
@@ -150,6 +194,17 @@ int colisao_InimigoPlayer(Inimigo *l, Jogador *j){
             (l->y + l->col->y + l->col->alt > j->y + j->col->y && l->y + l->col->y + l->col->alt < j->y + j->col->y + j->col->alt) ||
             (l->x + l->col->x + l->col->lar > j->x + j->col->x && l->x + l->col->x + l->col->lar < j->x + j->col->x + j->col->lar) &&
             (l->y + l->col->y + l->col->alt > j->y + j->col->y && l->y + l->col->y + l->col->alt < j->y + j->col->y + j->col->alt));
+}
+
+int colisao_InimigoItem(Inimigo *l, Jogador *j){
+    return ((l->x + l->col->x > j->x + j->item.col.x && l->x + l->col->x < j->x + j->item.col.x + j->item.col.lar) &&
+            (l->y + l->col->y > j->y + j->item.col.y && l->y + l->col->y < j->y + j->item.col.y + j->item.col.alt) ||
+            (l->x + l->col->x + l->col->lar > j->x + j->item.col.x && l->x + l->col->x + l->col->lar < j->x + j->item.col.x + j->item.col.lar) &&
+            (l->y + l->col->y > j->y + j->item.col.y && l->y + l->col->y < j->y + j->item.col.y + j->item.col.alt) ||
+            (l->x + l->col->x > j->x + j->item.col.x && l->x + l->col->x < j->x + j->item.col.x + j->item.col.lar) &&
+            (l->y + l->col->y + l->col->alt > j->y + j->item.col.y && l->y + l->col->y + l->col->alt < j->y + j->item.col.y + j->item.col.alt) ||
+            (l->x + l->col->x + l->col->lar > j->x + j->item.col.x && l->x + l->col->x + l->col->lar < j->x + j->item.col.x + j->item.col.lar) &&
+            (l->y + l->col->y + l->col->alt > j->y + j->item.col.y && l->y + l->col->y + l->col->alt < j->y + j->item.col.y + j->item.col.alt));
 }
 
 int paz(Inimigo *l, Jogador *j){

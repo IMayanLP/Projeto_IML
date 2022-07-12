@@ -6,12 +6,17 @@
 #include <allegro5/allegro_primitives.h>
 
 #include "objeto.h"
+#include "item.h"
 #include "caixa_colisao.h"
 #include "jogo.h"
 
 typedef struct {
+    int status;
     // atributos
     float vida_max, vida_atual;
+    float atk_base, atk_atual;
+
+    Item item;
 
     // movimentação
     int dir[4];
@@ -32,7 +37,7 @@ typedef struct {
 } Jogador;
 
 Jogador *criar_jogador(ALLEGRO_BITMAP *, ALLEGRO_BITMAP*, float, float, float);
-void mover_jogador(Jogador *, int, int);
+void teclas_jogador(Jogador *, int, int);
 void tick_jogador(Jogador *, Objeto *[mapa_x][mapa_y]);
 int colisao_PlayerMapa(Jogador *, Objeto *[mapa_x][mapa_y], int);
 void desenhar_jogador(Jogador *);

@@ -20,6 +20,7 @@ typedef struct{
     int ID;
 
     float range;
+    float vida;
 
     // movimentação
     int dir;
@@ -42,11 +43,13 @@ typedef struct lista_inimigos Inimigos;
 
 Inimigos *criar_lInimigos();
 int inserir_inimigo(Inimigos *, Inimigo);
+int remover_inimigo(Inimigos *, int);
 void desenhar_inimigos(Inimigos *);
 
-Inimigo criar_inimigo(ALLEGRO_BITMAP *, float, float, float);
+Inimigo criar_inimigo(ALLEGRO_BITMAP *, float, float, float, int);
 void tick_inimigo(Inimigos *, Jogador *, Objeto *[mapa_x][mapa_y]);
 int colisao_InimigoPlayer(Inimigo *, Jogador *);
+int colisao_InimigoItem(Inimigo *, Jogador *);
 int colisao_InimigoMapa(Inimigo *, Objeto *[mapa_x][mapa_y], int);
 int paz(Inimigo *, Jogador *);
 

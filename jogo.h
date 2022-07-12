@@ -27,6 +27,8 @@
 #define BAIXO 2
 #define ESQ 3
 
+#define ATAQUE 1
+
 int mapa_x;
 int mapa_y;
 float prop;

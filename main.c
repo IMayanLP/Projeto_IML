@@ -108,8 +108,8 @@ int main(){
 
     Inimigos *mobs = criar_lInimigos();
 
-    inserir_inimigo(mobs, criar_inimigo(spritesheet, 500, 300, 1.5));
-    inserir_inimigo(mobs, criar_inimigo(spritesheet, 700, 500, 2));
+    inserir_inimigo(mobs, criar_inimigo(spritesheet, 500, 300, 1.5, 1));
+    inserir_inimigo(mobs, criar_inimigo(spritesheet, 700, 500, 2, 2));
 
     Jogador *jogador = criar_jogador(bruxo, coracao, 200, 200, 3);
 
@@ -139,11 +139,11 @@ int main(){
         /** TICK **/
         if(evento.type == ALLEGRO_EVENT_KEY_DOWN){
             if(evento.keyboard.keycode == ALLEGRO_KEY_ESCAPE) fim = true;
-            mover_jogador(jogador, evento.keyboard.keycode, KEY_DOWN);
+            teclas_jogador(jogador, evento.keyboard.keycode, KEY_DOWN);
         }
 
         else if(evento.type == ALLEGRO_EVENT_KEY_UP){
-            mover_jogador(jogador, evento.keyboard.keycode, KEY_UP);
+            teclas_jogador(jogador, evento.keyboard.keycode, KEY_UP);
         }
 
         else if(evento.type == ALLEGRO_EVENT_MOUSE_AXES){
@@ -181,6 +181,8 @@ int main(){
             al_draw_rectangle(jogador->x + jogador->col->x, jogador->y + jogador->col->y, jogador->x + jogador->col->x + (jogador->col->lar), jogador->y + jogador->col->y + (jogador->col->alt), al_map_rgb(255, 255, 255), 1);
 
             desenhar_inimigos(mobs);
+
+            //al_draw_rotated_bitmap(espada, 0, 32, jogador->x, jogador->y, angulo, 0);
 
             al_draw_textf(font, al_map_rgb(0, 0, 0), 10, 10, 0, "<%.2f , %.2f>", jogador->x, jogador->y);
             al_flip_display();
