@@ -197,14 +197,25 @@ int colisao_InimigoPlayer(Inimigo *l, Jogador *j){
 }
 
 int colisao_InimigoItem(Inimigo *l, Jogador *j){
-    return ((l->x + l->col->x > j->x + j->item.col.x && l->x + l->col->x < j->x + j->item.col.x + j->item.col.lar) &&
-            (l->y + l->col->y > j->y + j->item.col.y && l->y + l->col->y < j->y + j->item.col.y + j->item.col.alt) ||
-            (l->x + l->col->x + l->col->lar > j->x + j->item.col.x && l->x + l->col->x + l->col->lar < j->x + j->item.col.x + j->item.col.lar) &&
-            (l->y + l->col->y > j->y + j->item.col.y && l->y + l->col->y < j->y + j->item.col.y + j->item.col.alt) ||
-            (l->x + l->col->x > j->x + j->item.col.x && l->x + l->col->x < j->x + j->item.col.x + j->item.col.lar) &&
-            (l->y + l->col->y + l->col->alt > j->y + j->item.col.y && l->y + l->col->y + l->col->alt < j->y + j->item.col.y + j->item.col.alt) ||
-            (l->x + l->col->x + l->col->lar > j->x + j->item.col.x && l->x + l->col->x + l->col->lar < j->x + j->item.col.x + j->item.col.lar) &&
-            (l->y + l->col->y + l->col->alt > j->y + j->item.col.y && l->y + l->col->y + l->col->alt < j->y + j->item.col.y + j->item.col.alt));
+    if(j->orient == DIR) {
+        return ((l->x + l->col->x > j->x + j->item.col[DIR].x && l->x + l->col->x < j->x + j->item.col[DIR].x + j->item.col[DIR].lar) &&
+            (l->y + l->col->y > j->y + j->item.col[DIR].y && l->y + l->col->y < j->y + j->item.col[DIR].y + j->item.col[DIR].alt) ||
+            (l->x + l->col->x + l->col->lar > j->x + j->item.col[DIR].x && l->x + l->col->x + l->col->lar < j->x + j->item.col[DIR].x + j->item.col[DIR].lar) &&
+            (l->y + l->col->y > j->y + j->item.col[DIR].y && l->y + l->col->y < j->y + j->item.col[DIR].y + j->item.col[DIR].alt) ||
+            (l->x + l->col->x > j->x + j->item.col[DIR].x && l->x + l->col->x < j->x + j->item.col[DIR].x + j->item.col[DIR].lar) &&
+            (l->y + l->col->y + l->col->alt > j->y + j->item.col[DIR].y && l->y + l->col->y + l->col->alt < j->y + j->item.col[DIR].y + j->item.col[DIR].alt) ||
+            (l->x + l->col->x + l->col->lar > j->x + j->item.col[DIR].x && l->x + l->col->x + l->col->lar < j->x + j->item.col[DIR].x + j->item.col[DIR].lar) &&
+            (l->y + l->col->y + l->col->alt > j->y + j->item.col[DIR].y && l->y + l->col->y + l->col->alt < j->y + j->item.col[DIR].y + j->item.col[DIR].alt));
+    } else if(j->orient == ESQ) {
+        return ((l->x + l->col->x > j->x + j->item.col[ESQ].x && l->x + l->col->x < j->x + j->item.col[ESQ].x + j->item.col[ESQ].lar) &&
+            (l->y + l->col->y > j->y + j->item.col[ESQ].y && l->y + l->col->y < j->y + j->item.col[ESQ].y + j->item.col[ESQ].alt) ||
+            (l->x + l->col->x + l->col->lar > j->x + j->item.col[ESQ].x && l->x + l->col->x + l->col->lar < j->x + j->item.col[ESQ].x + j->item.col[DIR].lar) &&
+            (l->y + l->col->y > j->y + j->item.col[ESQ].y && l->y + l->col->y < j->y + j->item.col[ESQ].y + j->item.col[ESQ].alt) ||
+            (l->x + l->col->x > j->x + j->item.col[ESQ].x && l->x + l->col->x < j->x + j->item.col[ESQ].x + j->item.col[ESQ].lar) &&
+            (l->y + l->col->y + l->col->alt > j->y + j->item.col[ESQ].y && l->y + l->col->y + l->col->alt < j->y + j->item.col[ESQ].y + j->item.col[DIR].alt) ||
+            (l->x + l->col->x + l->col->lar > j->x + j->item.col[ESQ].x && l->x + l->col->x + l->col->lar < j->x + j->item.col[ESQ].x + j->item.col[DIR].lar) &&
+            (l->y + l->col->y + l->col->alt > j->y + j->item.col[ESQ].y && l->y + l->col->y + l->col->alt < j->y + j->item.col[ESQ].y + j->item.col[DIR].alt));
+    }
 }
 
 int paz(Inimigo *l, Jogador *j){

@@ -14,10 +14,10 @@ typedef struct {
     float angulo;
     float bonus;
     int atributo;
-    Caixa_colisao col;
+    Caixa_colisao col[4];
 } Item;
 
-Item criar_item(int , float, int, Caixa_colisao);
+Item criar_item(int , float, int);
 desenhar_item(Item);
 
 #endif

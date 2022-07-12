@@ -25,8 +25,7 @@ Jogador *criar_jogador(ALLEGRO_BITMAP* spritesheet, ALLEGRO_BITMAP* coracao, flo
     j->orient = 1;
     j->status = 0;
 
-    Caixa_colisao *teste = criar_colisao(40, 20, 40, 40);
-    j->item = criar_item(2, 5, 1, *teste);
+    j->item = criar_item(2, 5, 1);
     j->col = criar_colisao(14, 20, 34, 40);
 
     return j;
@@ -38,24 +37,24 @@ void teclas_jogador(Jogador *jogador, int key, int event){
         case ALLEGRO_KEY_W:
             jogador->moving = TRUE;
             jogador->dir[CIMA] = TRUE;
-            jogador->orient = CIMA;
+            if(jogador->status == 0) jogador->orient = CIMA;
             break;
         case ALLEGRO_KEY_S:
             jogador->moving = TRUE;
             jogador->dir[BAIXO] = TRUE;
-            jogador->orient = BAIXO;
+            if(jogador->status == 0) jogador->orient = BAIXO;
             break;
         case ALLEGRO_KEY_D:
             jogador->moving = TRUE;
             jogador->dir[DIR] = TRUE;
-            jogador->orient = DIR;
-            jogador->item.angulo = -0.5;
+            if(jogador->status == 0) jogador->orient = DIR;
+            if(jogador->status == 0) jogador->item.angulo = -0.5;
             break;
         case ALLEGRO_KEY_A:
             jogador->moving = TRUE;
             jogador->dir[ESQ] = TRUE;
-            jogador->orient = ESQ;
-            jogador->item.angulo = -3.31;
+            if(jogador->status == 0) jogador->orient = ESQ;
+            if(jogador->status == 0) jogador->item.angulo = -1.17;
             break;
         case ALLEGRO_KEY_B:
             jogador->status = 1;
@@ -128,15 +127,17 @@ void tick_jogador(Jogador *jogador, Objeto *mapa[mapa_x][mapa_y]){
             else {
                 jogador->item.angulo = -0.5;
                 jogador->status = 0;
+                andando(jogador);
             }
         } else if(jogador->orient == ESQ) {
-            if(jogador->item.angulo > -4.71) {
+            if(jogador->item.angulo > -3.14) {
                 jogador->Satual = 0;
-                jogador->item.angulo += 0.1;
+                jogador->item.angulo -= 0.1;
             }
             else {
-                jogador->item.angulo = 2;
+                jogador->item.angulo = -1.17;
                 jogador->status = 0;
+                andando(jogador);
             }
         }
     }
@@ -180,8 +181,8 @@ void desenhar_jogador(Jogador *j){
     }
     if(j->status == 1) {
         if(j->orient == DIR) al_draw_rotated_bitmap(j->item.sprite, 0, 32, j->x + 40, j->y + 40, j->item.angulo, 0);
-        if(j->orient == ESQ) al_draw_rotated_bitmap(j->item.sprite, 0, 32, j->x + 40, j->y + 40, j->item.angulo, 0);
-        al_draw_rectangle(j->x + j->item.col.x, j->y + j->item.col.y, j->x + j->item.col.x + j->item.col.lar, j->y + j->item.col.y + j->item.col.alt, al_map_rgb(255, 255, 255), 1);
+        if(j->orient == ESQ) al_draw_rotated_bitmap(j->item.sprite, 0, 32, j->x + 20, j->y + 40, j->item.angulo, 0);
+        //al_draw_rectangle(j->x + j->item.col.x, j->y + j->item.col.y, j->x + j->item.col.x + j->item.col.lar, j->y + j->item.col.y + j->item.col.alt, al_map_rgb(255, 255, 255), 1);
     }
 
     int i;
