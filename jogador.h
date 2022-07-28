@@ -15,6 +15,7 @@ typedef struct {
     // atributos
     float vida_max, vida_atual;
     float atk_base, atk_atual;
+    int vel_atk, atk_disponivel;
 
     Item item;
 

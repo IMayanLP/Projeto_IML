@@ -17,6 +17,8 @@ Jogador *criar_jogador(ALLEGRO_BITMAP* spritesheet, ALLEGRO_BITMAP* coracao, flo
     j->vida_max = 100;
     j->atk_base = 10;
     j->atk_atual = 10;
+    j->vel_atk = 120; // vel_atk/60 = ataques p/ segundo (ex.: 120/60 = 1 ataque em cada 2 segungos
+    j->atk_disponivel = j->vel_atk;
     j->x = x/prop;
     j->y = y/prop;
     j->vel = vel;
@@ -37,27 +39,40 @@ void teclas_jogador(Jogador *jogador, int key, int event){
         case ALLEGRO_KEY_W:
             jogador->moving = TRUE;
             jogador->dir[CIMA] = TRUE;
-            if(jogador->status == 0) jogador->orient = CIMA;
+            if(jogador->status == 0) {
+                jogador->orient = CIMA;
+                jogador->item.angulo = 0.5;
+            }
             break;
         case ALLEGRO_KEY_S:
             jogador->moving = TRUE;
             jogador->dir[BAIXO] = TRUE;
-            if(jogador->status == 0) jogador->orient = BAIXO;
+            if(jogador->status == 0) {
+                jogador->orient = BAIXO;
+                jogador->item.angulo = 1.17;
+            }
             break;
         case ALLEGRO_KEY_D:
             jogador->moving = TRUE;
             jogador->dir[DIR] = TRUE;
-            if(jogador->status == 0) jogador->orient = DIR;
-            if(jogador->status == 0) jogador->item.angulo = -0.5;
+            if(jogador->status == 0) {
+                jogador->orient = DIR;
+                jogador->item.angulo = -0.5;
+            }
             break;
         case ALLEGRO_KEY_A:
             jogador->moving = TRUE;
             jogador->dir[ESQ] = TRUE;
-            if(jogador->status == 0) jogador->orient = ESQ;
-            if(jogador->status == 0) jogador->item.angulo = -1.17;
+            if(jogador->status == 0) {
+                jogador->orient = ESQ;
+                jogador->item.angulo = -1.17;
+            }
             break;
         case ALLEGRO_KEY_B:
-            jogador->status = 1;
+            if(jogador->atk_disponivel == jogador->vel_atk) {
+                jogador->status = 1;
+                jogador->atk_disponivel = 0;
+            }
         }
     }
 
@@ -84,6 +99,7 @@ void teclas_jogador(Jogador *jogador, int key, int event){
 }
 
 void tick_jogador(Jogador *jogador, Objeto *mapa[mapa_x][mapa_y]){
+    if(jogador->atk_disponivel < jogador->vel_atk) jogador->atk_disponivel++;
     if(jogador->status == 0){
         if(jogador->moving){
             if(jogador->dir[CIMA]) {
@@ -139,6 +155,26 @@ void tick_jogador(Jogador *jogador, Objeto *mapa[mapa_x][mapa_y]){
                 jogador->status = 0;
                 andando(jogador);
             }
+        } else if(jogador->orient == BAIXO) {
+            if(jogador->item.angulo < 3.14) {
+                jogador->Satual = 0;
+                jogador->item.angulo += 0.1;
+            }
+            else {
+                jogador->item.angulo = 1.17;
+                jogador->status = 0;
+                andando(jogador);
+            }
+        } else if(jogador->orient == CIMA) {
+            if(jogador->item.angulo > -1.25) {
+                jogador->Satual = 0;
+                jogador->item.angulo -= 0.1;
+            }
+            else {
+                jogador->item.angulo = 0;
+                jogador->status = 0;
+                andando(jogador);
+            }
         }
     }
 }
@@ -182,7 +218,9 @@ void desenhar_jogador(Jogador *j){
     if(j->status == 1) {
         if(j->orient == DIR) al_draw_rotated_bitmap(j->item.sprite, 0, 32, j->x + 40, j->y + 40, j->item.angulo, 0);
         if(j->orient == ESQ) al_draw_rotated_bitmap(j->item.sprite, 0, 32, j->x + 20, j->y + 40, j->item.angulo, 0);
-        //al_draw_rectangle(j->x + j->item.col.x, j->y + j->item.col.y, j->x + j->item.col.x + j->item.col.lar, j->y + j->item.col.y + j->item.col.alt, al_map_rgb(255, 255, 255), 1);
+        if(j->orient == BAIXO) al_draw_rotated_bitmap(j->item.sprite, 0, 32, j->x + 25, j->y + 50, j->item.angulo, 0);
+        if(j->orient == CIMA) al_draw_rotated_bitmap(j->item.sprite, 0, 32, j->x + 30, j->y + 30, j->item.angulo, 0);
+        al_draw_rectangle(j->x + j->item.col[j->orient].x, j->y + j->item.col[j->orient].y, j->x + j->item.col[j->orient].x + j->item.col[j->orient].lar, j->y + j->item.col[j->orient].y + j->item.col[j->orient].alt, al_map_rgb(255, 255, 255), 1);
     }
 
     int i;

@@ -182,8 +182,6 @@ int main(){
 
             desenhar_inimigos(mobs);
 
-            //al_draw_rotated_bitmap(espada, 0, 32, jogador->x, jogador->y, angulo, 0);
-
             al_draw_textf(font, al_map_rgb(0, 0, 0), 10, 10, 0, "<%.2f , %.2f>", jogador->x, jogador->y);
             al_flip_display();
 
