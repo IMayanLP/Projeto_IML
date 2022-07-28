@@ -27,7 +27,17 @@
 #define BAIXO 2
 #define ESQ 3
 
-#define ATAQUE 1
+#define ANDANDO 0
+#define ATACANDO 1
+
+#define SPRITE_INICIAL 0
+
+/// Itens
+#define ANGULO_CIMA 0.5
+#define ANGULO_BAIXO 1.17
+#define ANGULO_ESQ -1.17
+#define ANGULO_DIR -0.5
+
 
 int mapa_x;
 int mapa_y;

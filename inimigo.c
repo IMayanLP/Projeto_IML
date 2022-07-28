@@ -116,13 +116,13 @@ void tick_inimigo(Inimigos *l, Jogador *j, Objeto *mapa[mapa_x][mapa_y]){
                 aux->dados.moving = TRUE;
             } else {
                 aux->dados.moving = FALSE;
-                aux->dados.Satual = 0;
+                aux->dados.Satual = SPRITE_INICIAL;
             }
 
             if(colisao_InimigoPlayer(aux, j)){
                 j->vida_atual -= 0.1;
                 aux->dados.moving = FALSE;
-                aux->dados.Satual = 0;
+                aux->dados.Satual = SPRITE_INICIAL;
             }
 
             if(aux->dados.moving){
@@ -151,9 +151,9 @@ void tick_inimigo(Inimigos *l, Jogador *j, Objeto *mapa[mapa_x][mapa_y]){
                     }
                 }
                 if(aux->dados.Satual < 3.9) aux->dados.Satual += 0.1;
-                else aux->dados.Satual = 0;
+                else aux->dados.Satual = SPRITE_INICIAL;
             }
-            if(j->status == 1){
+            if(j->status == ATACANDO){
                 if(colisao_InimigoItem(aux, j)) {
                     aux->dados.vida -= 0.1 * j->atk_atual;
                 }
